@@ -3,6 +3,8 @@ project(PMDK_allocation_test)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+
 find_library(pmem libpmemobj++ REQUIRED)
 
 add_executable(PMDK_allocation_test main.cpp)
