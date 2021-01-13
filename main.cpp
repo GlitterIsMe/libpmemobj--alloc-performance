@@ -10,7 +10,7 @@
 #define ALLOCATION_UNIT 64
 #define RUN_TIMES 100
 
-const std::string PMEM = "mnt/pmem0/test";
+const std::string PMEM = "/pmem0/test/alloc_test";
 const std::string LAYOUT = "test";
 using namespace pmem::obj;
 
@@ -44,7 +44,7 @@ int main() {
             });
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::seconds>(end - start).count() << std::endl;
+        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
     }
 
     {
@@ -55,7 +55,7 @@ int main() {
            make_persistent_atomic<Block>(p, blocks[i]);
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::seconds>(end - start).count() << std::endl;
+        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
     }
 
     {
@@ -66,7 +66,7 @@ int main() {
             blocks[i] = new Block();
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Memory] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::seconds>(end - start).count() << std::endl;
+        std::cout << "[Memory] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
     }
     return 0;
 }
