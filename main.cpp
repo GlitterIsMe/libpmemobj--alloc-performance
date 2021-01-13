@@ -50,6 +50,10 @@ int main(int argc, char** argv) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
         std::cout << "[Transaction] alloc ops: " << RUN_TIMES / f.count() << std::endl;
+
+        for (int i = 0; i < RUN_TIMES; i++) {
+            delete_persistent<char[]>(blocks[i], allocation_unit);
+        }
     }
 
     {
@@ -62,6 +66,10 @@ int main(int argc, char** argv) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
         std::cout << "[Atomic] alloc ops: " << RUN_TIMES / f.count() << std::endl;
+
+        for (int i = 0; i < RUN_TIMES; i++) {
+            delete_persistent_atomic<char[]>(blocks[i], allocation_unit);
+        }
     }
 
     {
@@ -74,6 +82,9 @@ int main(int argc, char** argv) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
         std::cout << "[Memory] alloc ops: " << RUN_TIMES / f.count() << std::endl;
+        for (int i = 0; i < RUN_TIMES; i++) {
+            delete[] blocks[i];
+        }
     }
     return 0;
 }
