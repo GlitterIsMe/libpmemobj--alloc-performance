@@ -28,7 +28,7 @@ static inline int file_exists(char const *file) {
 
 int main() {
     pool<Root> p;
-    if (file_exists(PMEM.c_str())) {
+    if (!file_exists(PMEM.c_str())) {
         p = pool<Root>::open(PMEM, LAYOUT);
     } else {
         p = pool<Root>::create(PMEM, LAYOUT, 1UL * 1024 * 1024* 1024);
@@ -44,7 +44,8 @@ int main() {
             });
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
+        std::chrono::duration<float> f = end - start;
+        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
     }
 
     {
@@ -55,7 +56,8 @@ int main() {
            make_persistent_atomic<Block>(p, blocks[i]);
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
+        std::chrono::duration<float> f = end - start;
+        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
     }
 
     {
@@ -66,7 +68,8 @@ int main() {
             blocks[i] = new Block();
         }
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "[Memory] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() * 1000000 << std::endl;
+        std::chrono::duration<float> f = end - start;
+        std::cout << "[Memory] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
     }
     return 0;
 }
