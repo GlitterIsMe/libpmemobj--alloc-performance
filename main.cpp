@@ -52,7 +52,9 @@ int main(int argc, char** argv) {
         std::cout << "[Transaction] alloc ops: " << RUN_TIMES / f.count() << std::endl;
 
         for (int i = 0; i < RUN_TIMES; i++) {
-            delete_persistent<char[]>(blocks[i], allocation_unit);
+            transaction::run(p, [&] {
+                delete_persistent<char[]>(blocks[i], allocation_unit);
+            });
         }
     }
 
