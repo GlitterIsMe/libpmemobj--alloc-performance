@@ -1,7 +1,7 @@
+#include <unistd.h>
 #include <iostream>
 #include <string>
 #include <chrono>
-#include <experimental/filesystem>
 #include <libpmemobj++/make_persistent.hpp>
 #include <libpmemobj++/make_persistent_atomic.hpp>
 #include <libpmemobj++/pool.hpp>
@@ -22,9 +22,13 @@ struct Root {
     persistent_ptr<Block> p;
 };
 
+static inline int file_exists(char const *file) {
+    return access(file, F_OK);
+}
+
 int main() {
     pool<Root> p;
-    if (std::filesystem::exists(PMEM.c_str())) {
+    if (file_exists(PMEM.c_str())) {
         p = pool<Root>::open(PMEM, LAYOUT);
     } else {
         p = pool<Root>::create(PMEM, LAYOUT, 1UL * 1024 * 1024* 1024);
