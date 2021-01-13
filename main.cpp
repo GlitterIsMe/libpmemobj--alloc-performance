@@ -45,7 +45,7 @@ int main() {
         }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
-        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
+        std::cout << "[Transaction] alloc ops: " << RUN_TIMES / f.count() << std::endl;
     }
 
     {
@@ -57,7 +57,7 @@ int main() {
         }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
-        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
+        std::cout << "[Atomic] alloc ops: " << RUN_TIMES / f.count() << std::endl;
     }
 
     {
@@ -69,7 +69,7 @@ int main() {
         }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
-        std::cout << "[Memory] alloc ops: " << RUN_TIMES / std::chrono::duration_cast<std::chrono::microseconds>(f).count() * 1000000 << std::endl;
+        std::cout << "[Memory] alloc ops: " << RUN_TIMES / f.count() << std::endl;
     }
     return 0;
 }
