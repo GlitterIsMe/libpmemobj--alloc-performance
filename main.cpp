@@ -3,7 +3,9 @@
 #include <string>
 #include <chrono>
 #include <libpmemobj++/make_persistent.hpp>
+#include <libpmemobj++/make_persistent_array.hpp>
 #include <libpmemobj++/make_persistent_atomic.hpp>
+#include <libpmemobj++/make_persistent_array_atomic.hpp>
 #include <libpmemobj++/pool.hpp>
 #include <libpmemobj++/transaction.hpp>
 
@@ -14,33 +16,35 @@ const std::string PMEM = "/pmem0/test/alloc_test";
 const std::string LAYOUT = "test";
 using namespace pmem::obj;
 
-struct Block {
-    char block[ALLOCATION_UNIT];
-};
-
 struct Root {
-    persistent_ptr<Block> p;
+    persistent_ptr<char> p;
 };
 
 static inline int file_exists(char const *file) {
     return access(file, F_OK);
 }
 
-int main() {
+int main(int argc, char** argv) {
     pool<Root> p;
     if (!file_exists(PMEM.c_str())) {
         p = pool<Root>::open(PMEM, LAYOUT);
     } else {
-        p = pool<Root>::create(PMEM, LAYOUT, 1UL * 1024 * 1024* 1024);
+        p = pool<Root>::create(PMEM, LAYOUT, 10UL * 1024 * 1024* 1024);
     }
+    if (argc != 2) {
+        std::cout << "Mismatching parameter number " << argc << std::endl;
+        exit(-1);
+    }
+    int allocation_unit = atoi(argv[1]);
+    std::cout << "Allocation unit: " << allocation_unit << "bytes\n";
 
     {
         // Transaction Allocation
         auto start = std::chrono::high_resolution_clock::now();
-        persistent_ptr<Block> blocks[RUN_TIMES];
+        persistent_ptr<char[]> blocks[RUN_TIMES];
         for (int i = 0; i < RUN_TIMES; i++) {
             transaction::run(p, [&] {
-                blocks[i] = make_persistent<Block>();
+                blocks[i] = make_persistent<char[]>(allocation_unit);
             });
         }
         auto end = std::chrono::high_resolution_clock::now();
@@ -51,9 +55,9 @@ int main() {
     {
         // Atomic Allocation
         auto start = std::chrono::high_resolution_clock::now();
-        persistent_ptr<Block> blocks[RUN_TIMES];
+        persistent_ptr<char[]> blocks[RUN_TIMES];
         for (int i = 0; i < RUN_TIMES; i++) {
-           make_persistent_atomic<Block>(p, blocks[i]);
+           make_persistent_atomic<char[]>(p, blocks[i], allocation_unit);
         }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
@@ -63,9 +67,9 @@ int main() {
     {
         // Memory Allocation
         auto start = std::chrono::high_resolution_clock::now();
-        Block* blocks[RUN_TIMES];
+        char* blocks[RUN_TIMES];
         for (int i = 0; i < RUN_TIMES; i++) {
-            blocks[i] = new Block();
+            blocks[i] = new char[allocation_unit];
         }
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> f = end - start;
